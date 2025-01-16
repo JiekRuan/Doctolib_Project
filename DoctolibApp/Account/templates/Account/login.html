@@ -1,16 +1,21 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Connexion</title>
-</head>
-<body>
-    <h1>Connexion</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}  <!-- Cela affiche le formulaire -->
-        <button type="submit">Se connecter</button>
-    </form>
-</body>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  </head>
+  <body>
+    <header>
+      <h1>Connexion</h1>
+    </header>
+    <main>
+      <form method="post" class="space-y-4 bg-gray-100 p-6 rounded-lg shadow">
+        {% csrf_token %} {{ form.as_p }}
+        <button type="submit" class="btn">Se connecter</button>
+      </form>
+    </main>
+  </body>
 </html>

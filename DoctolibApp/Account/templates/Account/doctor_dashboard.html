@@ -1,0 +1,6 @@
+{% extends 'Account/base.html' %} {% block title %}Tableau de bord Médecin{%
+endblock %} {% block content %}
+<h1>Bienvenue, Dr. {{ request.user.username }}</h1>
+<p>Voici votre tableau de bord en tant que médecin.</p>
+<!-- nos graphes et dashboards seront ici -->
+{% endblock %}
