@@ -4,7 +4,7 @@
   <h1>Bienvenue sur DoctolibApp</h1>
   <p>Votre solution pour gérer et diagnostiquer les données ECG.</p>
   <div class="button-group">
-    <a href="{% url 'account:login' %}" class="btn">Connexion</a>
+    <a href="{% url 'Account:login' %}" class="btn">Connexion</a>
     <a href="#" class="btn" onclick="chooseRole()">Inscription</a>
   </div>
 </div>
@@ -13,10 +13,10 @@
 <div id="role-popup" class="popup" style="display: none">
   <div class="popup-content">
     <h2>Vous etes ...</h2>
-    <button onclick="window.location.href='{% url 'account:register_patient' %}'">
+    <button onclick="window.location.href='{% url 'Account:register_patient' %}'">
       Patient
     </button>
-    <button onclick="window.location.href='{% url 'account:register_doctor' %}'">
+    <button onclick="window.location.href='{% url 'Account:register_doctor' %}'">
       Médecin
     </button>
     <button onclick="closePopup()">Annuler</button>

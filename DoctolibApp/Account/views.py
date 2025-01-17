@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, DoctorRegistrationForm, PatientRegistrationForm
 
 
-
 # Page d'accueil
 def home(request):
     return render(request, 'Account/home.html')
@@ -21,13 +20,9 @@ def login_view(request):
                 login(request, user)
                 # Redirection basée sur le rôle
                 if user.role == 'doctor':
-                    return redirect(
-                        'doctor_dashboard'
-                    ) 
+                    return redirect('doctor_dashboard')
                 elif user.role == 'patient':
-                    return redirect(
-                        'patient_dashboard'
-                    )  
+                    return redirect('patient_dashboard')
     else:
         form = LoginForm()
     return render(request, 'Account/login.html', {'form': form})
@@ -45,7 +40,7 @@ def register_doctor(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('account:doctor_dashboard')
+            return redirect('Doctor:doctor_dashboard')
     else:
         form = DoctorRegistrationForm()
     return render(request, 'Account/register_doctor.html', {'form': form})
@@ -59,19 +54,18 @@ def register_patient(request):
             user = form.save()
             login(request, user)
             return redirect(
-                'account:patient_dashboard'
-            ) 
+                'Patient:patient_dashboard'
+            )  
     else:
         form = PatientRegistrationForm()
     return render(request, 'Account/register_patient.html', {'form': form})
 
 
 
-
-@login_required
 def patient_dashboard(request):
-    return render(request, 'Account/patient_dashboard.html')
+    return render(request, 'Patient/patient_dashboard.html')
+
 
 @login_required
 def doctor_dashboard(request):
-    return render(request, 'Account/doctor_dashboard.html')
+    return render(request, 'Doctor/doctor_dashboard.html')
