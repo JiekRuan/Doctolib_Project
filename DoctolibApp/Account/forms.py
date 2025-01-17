@@ -64,7 +64,7 @@ class DoctorRegistrationForm(UserCreationForm):
     first_name = forms.CharField(label="Prénom", max_length=50)
     last_name = forms.CharField(label="Nom", max_length=50)
     phone_number = forms.CharField(label="Numéro de téléphone", max_length=15)
-    specialty = forms.ChoiceField(label="Spécialité", choices=[SPECIALTY_CHOICES])
+    specialty = forms.ChoiceField(label="Spécialité", choices=SPECIALTY_CHOICES)
     email = forms.EmailField(label="Adresse email")
 
     class Meta:
