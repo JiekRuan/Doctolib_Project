@@ -1,0 +1,234 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+    rel="shortcut icon"
+    type="image/png"
+    href="{% static 'images/favicon.png' %}"
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap"
+    rel="stylesheet"
+  />
+    <title>HMS</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        font-family: sans-serif;
+        background-color: ghostwhite;
+        font-family: "Kanit", sans-serif;
+      }
+
+      .container {
+        width: 400px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .head {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 40px;
+      }
+      .head h1 {
+          margin-bottom: 30px;
+          text-align: center;
+          color: #222222;
+      }
+      .avatar {
+        width: 110%;
+        height: 80px;
+        border-radius: 10%;
+      }
+      .avatar img {
+        width: inherit;
+        height: inherit;
+        border-radius: inherit;
+      }
+      
+       .card {
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+        width: 100%;
+      }
+       
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+      input {
+        height: 40px;
+        font-size: 16px;
+        margin-bottom: 16px;
+        border: none;
+        outline: none;
+        border-bottom: 1.5px solid rgb(190, 188, 188);
+        transition: all 0.3s ease-in-out;
+        font-family: "Kanit", sans-serif;
+      }
+      input:focus {
+        border-bottom: 1.5px solid #007bff;
+      }
+      input::placeholder {
+        color: #888;
+      }
+      input::-webkit-input-placeholder {
+        color: #888;
+      }
+      input:-webkit-autofill {
+          background-color: white !important;
+          transition: background-color 5000s ease-in-out 0s;
+          -webkit-text-fill-color: black !important;
+          box-shadow: 0 0 0px 1000px white inset !important;
+      }
+      button {
+        height: 42px;
+        background-color: #1206C0;
+        border: none;
+        border-radius: 22px;
+        margin-top: 20px;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.24);
+        font-family: "Kanit", sans-serif;
+      }
+      button:hover {
+        transform: scale(1.02);
+        background-color: #065db3;
+      }
+
+      ul {
+        list-style-type: none;
+        margin-top: 50px;
+      }
+      li {
+        position: relative;
+        padding-left: 15px;
+        display: flex;
+        align-items: center;
+      }
+      li::before {
+        content: "•";
+        color: #888;
+        font-size: 20px;
+        position: absolute;
+        left: 0;
+      }
+      li:first-of-type {
+        margin-bottom: 10px;
+      }
+
+      ul p {
+        color: #888;
+      }
+      ul a {
+        text-decoration: none;
+        color: #007bff;
+      }
+      em {
+        font-family: "Kanit", sans-serif;
+      }  
+      
+      .messages {
+      margin-bottom: 20px;
+    }
+    
+    .message {
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      font-family: "Kanit", sans-serif;
+    }
+    
+    .message.error {
+      background-color: #ffdddd;
+      color: #d9534f;
+    }
+    
+    .message.warning {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .message.success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    </style>
+  </head>
+
+  <body class="light">
+    <div class="container">
+      
+      <div class="head">
+        <div class="avatar">
+          <img src="/media/hms-logo.png" alt="" />
+        </div>
+      </div>
+    <div class="card">
+        <h2 style="text-align: center; color: #222222; margin-bottom: 20px;">Connectez-vous</h2>
+        {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+            <div class="message {{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    
+        <form method="post">
+      {% csrf_token %}
+          <input
+          id="email"
+          name="email"
+          type="text"
+          placeholder="Email"
+        />
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="Mot de passe"
+        />
+
+        <button type="submit" id="submitButton">Connectez-vous</button>
+      </form>
+        
+    </div>
+      
+      <ul>
+        <li>
+          <p>
+            Vous ne disposez pas d'un compte ? 
+            <a href="{% url 'signup' %}">Crée un compte</a>
+          </p>
+        </li>
+        <li>
+          <p><a href="{% url 'home' %}">Retour à l'accueil</a></p>
+        </li>
+      </ul>
+    </div>
+    <script>
+    </script>
+  </body>
+</html>

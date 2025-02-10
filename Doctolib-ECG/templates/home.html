@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctolib{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center">
+    <div class="max-w-2xl mx-auto text-center px-4">
+        <h1 class="text-4xl font-bold text-gray-800 mb-6">
+            Doctolib - Specialité ECG
+        </h1>
+        <p class="text-xl text-gray-600 mb-12">
+            Vous trouverez vos résultats ECG sur notre platform
+        </p>
+        
+        {% if not user.is_authenticated %}
+            <div class="space-y-6">
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="{% url 'signup' %}?role=Doctor" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors">
+                        Vous êtes Docteur ?
+                    </a>
+                    <a href="{% url 'signup' %}?role=Patient" 
+                       class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors">
+                       Vous êtes Patient ?
+                    </a>
+                </div>
+                
+                <p class="text-gray-600">
+                    Vous possédez déjà un compte ? 
+                    <a href="{% url 'login' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
+                        Identifiez-vous
+                    </a>
+                </p>
+            </div>
+        {% else %}
+            <div class="text-center">
+                <a href="{% if user.role == 'Doctor' %}{% url 'doctor_detail' user.id %}{% else %}{% url 'patient_detail' user.id %}{% endif %}" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-semibold inline-block">
+                    Accèder au dashbord
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

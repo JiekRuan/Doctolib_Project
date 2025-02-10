@@ -1,0 +1,246 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="{% static 'images/favicon.png' %}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <title>Doctolib - Spécialité ECG</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: ghostwhite;
+        font-family: "Kanit", sans-serif;
+      }
+
+      .container {
+        width: 500px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      h1 {
+        margin-bottom: 24px;
+        text-align: center;
+        color: #555555;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+
+    
+      .head {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 40px;
+      }
+
+      .head h1 {
+        margin-bottom: 30px;
+        text-align: center;
+        color: #222222;
+    }
+
+      .avatar {
+        width: 105%;
+        height: 80px;
+        border-radius: 10%;
+      }
+      .avatar img {
+        width: inherit;
+        height: inherit;
+        border-radius: inherit;
+      }
+
+      .card {
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+        width: 100%;
+      }
+      input, select {
+        height: 40px;
+        font-size: 16px;
+        margin-bottom: 16px;
+        border: none;
+        outline: none;
+        border-bottom: 1.5px solid rgb(190, 188, 188);
+        transition: all 0.3s ease-in-out;
+        font-family: "Kanit", sans-serif;
+        background-color: white;
+      }
+      input:focus {
+        border-bottom: 1.5px solid #007fff;
+      }
+      input::placeholder {
+        color: #888;
+      }
+      input::-webkit-input-placeholder {
+        color: #888;
+      }
+      input:-webkit-autofill {
+          background-color: white !important;
+          transition: background-color 5000s ease-in-out 0s;
+          -webkit-text-fill-color: black !important;
+          box-shadow: 0 0 0px 1000px white inset !important;
+      }
+      button {
+        height: 42px;
+        background-color: #1206C0;
+        border: none;
+        border-radius: 22px;
+        margin-top: 20px;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.24);
+        font-family: "Kanit", sans-serif;
+      }
+      button:hover {
+        background-color: #065db3;
+      }
+
+      ul {
+        list-style-type: none;
+        margin-top: 50px;
+      }
+      li {
+        position: relative;
+        padding-left: 15px;
+        display: flex;
+        align-items: center;
+      }
+      li::before {
+        content: "•";
+        color: #888;
+        font-size: 20px;
+        position: absolute;
+        left: 0;
+      }
+      li:first-of-type {
+        margin-bottom: 10px;
+      }
+
+      ul p {
+        color: #888;
+      }
+      ul a {
+        text-decoration: none;
+        color: #007fff;
+      }
+      em {
+        font-family: "Kanit", sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="head">  
+        <div class="avatar">
+          <img src="/media/hms-logo.png" alt="" />
+        </div>
+      </div>
+
+      <div class="card">
+        <h1>Crée votre compte</h1>
+        <form id="signupForm" method="post" action="{% url 'signup' %}">
+          {% csrf_token %}
+          <input type="email" name="email" placeholder="Email" required />
+          <input type="text" name="first_name" placeholder="Prénom" required />
+          <input type="text" name="last_name" placeholder="Nom" required />
+          <input type="tel" name="phone" placeholder="Numéro de téléphone" required />
+          
+          <select name="role" id="role" onchange="toggleDoctorDropdown()" required>
+            <option value="">Vous êtes ?</option>
+            <option value="Patient" {% if default_role == "Patient" %}selected{% endif %}>Patient</option>
+            <option value="Doctor" {% if default_role == "Doctor" %}selected{% endif %}>Docteur</option>
+          </select>
+          
+          <select name="doctor" id="doctorDropdown" style="display: none;">
+            <option value="">Select Doctor</option>
+            {% for doctor in doctors %}
+              <option value="{{ doctor.id }}">{{ doctor.first_name }} {{ doctor.last_name }}</option>
+            {% endfor %}
+          </select>
+
+          <input type="password" name="password" placeholder="Mot de passe" onkeyup="validatePassword()" required />
+          <input type="password" name="confirm_password" placeholder="Confirmez votre mot de passe" onkeyup="validatePassword()" required />          
+          <p id="passwordError" style="color: red; display: none;"></p>  
+          <button type="submit" id="submitButton">Crée votre compte</button>
+        </form>
+      </div>
+      <ul>
+        <li>
+          <p>Vous possédez déjà un compte ?<a href="{% url 'login' %}"> Identifiez-vous</a></p>
+        </li>
+        <li>
+          <p><a href="{% url 'home' %}">Retour à l'accueil</a></p>
+        </li>
+
+
+      </ul>
+    </div>
+
+    <script>
+      function toggleDoctorDropdown() {
+        let role = document.getElementById("role").value;
+        let doctorDropdown = document.getElementById("doctorDropdown");
+        if (role === "Patient") {
+          doctorDropdown.style.display = "block";
+        } else {
+          doctorDropdown.style.display = "none";
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        toggleDoctorDropdown();
+      });
+
+      function validatePassword() {
+        let password = document.querySelector("input[name='password']").value;
+        let confirm_password = document.querySelector("input[name='confirm_password']").value;
+        let error_message = document.getElementById("passwordError");
+        let submitButton = document.getElementById("submitButton");
+
+        let passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        
+        if (!passwordRegex.test(password)) {
+            error_message.textContent = "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.";
+            error_message.style.display = "block";
+            submitButton.disabled = true;
+        } else if (password !== confirm_password) {
+            error_message.textContent = "Les mots de passe ne correspondent pas.";
+            error_message.style.display = "block";
+            submitButton.disabled = true;
+        } else {
+            error_message.style.display = "none";
+            submitButton.disabled = false;
+        }
+    }
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    {% if user.role == "Doctor" %}
+    <div class="mb-4">
+        <a href="{% url 'doctor_detail' patient.doctor.pk %}" 
+           class="inline-flex items-center text-blue-600 hover:text-blue-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+            </svg>
+            Back to Doctor's Profile
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h1 class="text-2xl font-bold mb-4">Information du patient</h1>
+        <div class="space-y-2">
+            <p><strong>Nom:</strong> {{ patient.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ patient.email }}</p>
+            <p><strong>Numéro de téléphone:</strong> {{ patient.phone_number|default:"Not provided" }}</p>
+            <p><strong>Docteur:</strong> 
+                {% if patient.doctor %}
+                    <a href="{% url 'doctor_detail' patient.doctor.pk %}" 
+                       class="text-blue-600 hover:text-blue-800">
+                        {{ patient.doctor.get_full_name }}
+                    </a>
+                {% else %}
+                    Not assigned
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    {% if user.role == "Patient" %}
+    <!-- CSV Upload Section (only for patients) -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold mb-4">Veuillez déposer votre fichier d'ECG</h2>
+        <form method="post" enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+            <div class="space-y-2">
+                {{ csv_form.csv_file }}
+                {% if csv_form.csv_file.help_text %}
+                    <p class="text-sm text-gray-500">{{ csv_form.csv_file.help_text }}</p>
+                {% endif %}
+                {% if csv_form.csv_file.errors %}
+                    {% for error in csv_form.csv_file.errors %}
+                        <p class="text-sm text-red-600">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <button type="submit" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                Transférer les données
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if success_message %}
+    <div class="alert alert-success">
+        <strong>Succès :</strong> {{ success_message }}
+    </div>
+    {% endif %}
+    
+    {% if error_message %}
+    <div class="alert alert-danger">
+        <strong>Erreur :</strong> {{ error_message }}
+    </div>
+    {% endif %}
+    {% if predictions %}
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">Résultats de la prédiction</h2>
+        <ul>
+            {% for prediction in predictions %}
+                <li>{{ prediction }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
