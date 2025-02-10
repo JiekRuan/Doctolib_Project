@@ -127,4 +127,4 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-LOGIN_URL = 'Account/login/'  # L'URL correspondant à la vue de connexion
+#LOGIN_URL = 'login/'  # L'URL correspondant à la vue de connexion

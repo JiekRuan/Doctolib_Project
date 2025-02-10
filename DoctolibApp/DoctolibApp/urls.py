@@ -21,5 +21,7 @@ from Account import views as account_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Account.urls')),  # Inclut toutes les URLs de l'application 'Account'
+    path('doctor/', include('Doctor.urls')),  # Inclut toutes les URLs de l'application 'Doctor'
+    path('patient/', include('Patient.urls')),  # Inclut toutes les URLs de l'application 'Patient'
 ]
 

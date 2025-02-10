@@ -64,7 +64,7 @@ class DoctorRegistrationForm(UserCreationForm):
     first_name = forms.CharField(label="Prénom", max_length=50)
     last_name = forms.CharField(label="Nom", max_length=50)
     phone_number = forms.CharField(label="Numéro de téléphone", max_length=15)
-    specialty = forms.ChoiceField(label="Spécialité", choices=[SPECIALTY_CHOICES])
+    specialty = forms.ChoiceField(label="Spécialité", choices=SPECIALTY_CHOICES)
     email = forms.EmailField(label="Adresse email")
 
     class Meta:
@@ -74,7 +74,7 @@ class DoctorRegistrationForm(UserCreationForm):
     def clean_rpps_number(self):
         rpps_number = self.cleaned_data.get('rpps_number')
         if not rpps_number.isdigit() or len(rpps_number) != 11:
-            raise ValidationError(
+            raise forms.ValidationError(
                 "Le numéro RPPS doit contenir exactement 11 chiffres."
             )
         return rpps_number
