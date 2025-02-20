@@ -22,6 +22,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.functional import cached_property
 from django.core.validators import validate_email
+import joblib
+from sklearn.preprocessing import StandardScaler
+
 
 class User(BaseModel, AbstractUser):
     USER_TYPE = (
@@ -40,12 +43,12 @@ class User(BaseModel, AbstractUser):
     csv_upload_date = models.DateTimeField(null=True, blank=True)
 
     # 🔹 Champ pour stocker le chemin du modèle Keras (si besoin de plusieurs modèles)
-    keras_model_path = models.CharField(max_length=255, default="modelV2Class_full.keras")
-
+    keras_model_path = models.CharField(max_length=255, default="./modelV2Class_full.keras")
     # 🔹 Stockage des prédictions en JSON
     predictions = models.JSONField(null=True, blank=True)
 
     # 🔹 Suppression de `username` et utilisation de l'email comme identifiant
+    
     username = None
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
@@ -73,87 +76,57 @@ class User(BaseModel, AbstractUser):
         super(User, self).save(*args, **kwargs)
 
 
-
     def process_csv_with_keras(self):
-        """Traite le fichier CSV et stocke les prédictions dans la base de données."""
+        """Traite le fichier CSV, effectue des prédictions et retourne la classe prédite."""
         if not self.csv_data:
             return None
 
         # Récupérer le chemin du fichier CSV
         csv_path = os.path.join(settings.MEDIA_ROOT, str(self.csv_data))
-
-        # Vérifier que le fichier existe
         if not os.path.exists(csv_path):
-            print(f"❌ Le fichier {csv_path} n'existe pas.")
-            return None
+            raise FileNotFoundError(f"Le fichier CSV {csv_path} n'existe pas.")
 
-        # Charger les données CSV dans un DataFrame Pandas
+        # Charger les données CSV
         try:
-            df = pd.read_csv(csv_path, sep=';', header=None)
+            df = pd.read_csv(csv_path, sep=";", header=None)
         except Exception as e:
-            print(f"❌ Erreur lors de la lecture du CSV : {e}")
-            return None
-
-        # Vérifier la forme des données avant et après suppression de la dernière colonne
-        print("Shape of the original dataframe:", df.shape)
-
-        # Supprimer la dernière colonne si nécessaire (s'assurer qu'il reste bien 187 colonnes)
-        df = df.iloc[:, :187]  # Garde les 187 premières colonnes
-
-        print("Shape of the dataframe after removing the last column:", df.shape)
+            raise ValueError(f"Erreur lors de la lecture du fichier CSV : {e}")
 
         # Convertir en numpy array
         X = df.values
-        print("Shape of X before reshape:", X.shape)
 
-        # Reshaper la donnée pour correspondre au format attendu par le modèle (1, 187, 1)
-        X = X.reshape((1, 187, 1))
-        print("Shape of X after reshape:", X.shape)
+        # Charger le scaler
+        scaler_path = os.path.join(settings.MEDIA_ROOT, "./scaler.pkl")
+        scaler = joblib.load(scaler_path)
+        X_scaled = scaler.transform(X)
+        X_scaled = X_scaled.reshape((X_scaled.shape[0], X_scaled.shape[1], 1))
 
         # Charger le modèle Keras
         model_path = os.path.join(settings.MEDIA_ROOT, self.keras_model_path)
+        print(model_path)
+        model = tf.keras.models.load_model(model_path)
+        print(model.summary())
 
-        if not os.path.exists(model_path):
-            print(f"❌ Le modèle {model_path} n'existe pas.")
-            return None
+        # Faire une prédiction
+        predictions = model.predict(X_scaled)
 
-        try:
-            model = tf.keras.models.load_model(model_path)
-        except Exception as e:
-            print(f"❌ Erreur lors du chargement du modèle : {e}")
-            return None
-
-        # Faire une prédiction avec le modèle
-        predictions = model.predict(X)
-
-        # Prendre la classe prédite (si le modèle fait une classification)
+        # Obtenir la classe prédite
         predicted_classes = np.argmax(predictions, axis=1)
 
-        print("Predicted class:", predicted_classes)
-
-        # Dictionnaire des noms de classes
-        # class_names = {
-        #     0: "Battement normal (N)",
-        #     1: "Contraction ventriculaire prématurée (PVC)",
-        #     2: "Contraction auriculaire prématurée (PAC)",
-        #     3: "Battement de fusion (FB)",
-        #     4: "Battement non classifiable (U)"
-        # }
-        class_names ={
-            1: "Battement normal",
-            2: "Battement normal"
-
+        # Mapping des classes
+        class_names = {
+            0: "Battement normal (N)",
+            1: "Contraction ventriculaire prématurée (PVC)",
+            2: "Contraction auriculaire prématurée (PAC)",
+            3: "Battement de fusion (FB)",
+            4: "Battement non classifiable (U)"
         }
-        # Remplacer les indices des classes par leurs noms
-        predictions_with_names = [class_names[class_num] for class_num in predicted_classes]
+        predicted_class_labels = [class_names[cls] for cls in predicted_classes]
 
-        # Convertir les prédictions en format JSON pour les enregistrer dans la base de données
-        predictions_json = json.dumps(predictions_with_names)
-
-        # Sauvegarder les prédictions dans la base de données
+        # Sauvegarder la classe prédite
+        predictions_json = json.dumps(predicted_class_labels)
         self.predictions = predictions_json
         self.save()
 
-        # Retourner les prédictions avec les noms
-        return predictions_with_names
-
+        # Retourner uniquement la classe prédite sous forme de noms
+        return predicted_class_labels   
